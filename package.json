@@ -3,7 +3,9 @@
     "version": "0.0.0",
     "license": "MIT",
     "scripts": {
-        "dev": "npx nx run backend:serve",
+        "dev": "npx nx run-many --target=serve --projects=backend,web",
+        "dev:backend": "nodemon --watch apps/backend --exec npx nx run backend:serve",
+        "dev:frontend": "nodemon --watch apps/web --exec npx nx run web:serve",
         "build": "tsc -b && vite build",
         "lint": "eslint .",
         "preview": "vite preview"
