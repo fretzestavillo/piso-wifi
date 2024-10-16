@@ -31,4 +31,4 @@ Web:
 
 API:  
 Backend API:  
-[http://localhost:3000/graphql](http://localhost:3000/)
+[http://localhost:3000/](http://localhost:3000/)
