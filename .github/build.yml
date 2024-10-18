@@ -1,0 +1,47 @@
+name: Build and Push Dockerize Python Image to Google Cloud Platform
+
+on:
+  push:
+    branches:
+      - main
+
+env:
+  PROJECT_ID: ${{ secrets.GCE_PROJECT }}
+  GCE_INSTANCE: ${{ secrets.GCE_INSTANCE }}
+  GCE_INSTANCE_ZONE: ${{ secrets.GCE_INSTANCE_ZONE }}
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Code checkout
+        uses: actions/checkout@v2
+
+      - name: Install the gcloud CLI
+        uses: google-github-actions/setup-gcloud@v0
+        with:
+          service_account_key: ${{ secrets.GOOGLE_APPLICATION_CREDENTIALS }}
+          export_default_credentials: true
+
+      - name: Build and push the Docker image to Artifact Registry
+        run: |
+          gcloud auth configure-docker asia-southeast1-docker.pkg.dev
+          docker build -t asia-southeast1-docker.pkg.dev/docker-390508/demo/python:3.9-alpine .
+          docker push asia-southeast1-docker.pkg.dev/docker-390508/demo/python:3.9-alpine
+
+      - name: Deploy
+
+        run: |
+          gcloud config set project "$PROJECT_ID"
+          gcloud compute instances update-container "$GCE_INSTANCE" \
+            --zone "$GCE_INSTANCE_ZONE" \
+           --container-image asia-southeast1-docker.pkg.dev/docker-390508/demo/python \
+            --container-restart-policy on-failure
+
+      # - name: Deploy
+      #   run: |-
+      #     gcloud compute instances update-container "$GCE_INSTANCE" \
+      #     --zone "$GCE_INSTANCE_ZONE" \
+      #    --container-env-file /tmp/your-custom.env \
+      #     --container-image "gcr.io/$PROJECT_ID/$GCE_INSTANCE:prod-$GITHUB_SHA" \
+      #     --container-restart-policy on-failure
