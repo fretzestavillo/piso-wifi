@@ -6,9 +6,7 @@ on:
       - main
 
 env:
-  PROJECT_ID: ${{ secrets.GCE_PROJECT }}
-  GCE_INSTANCE: ${{ secrets.GCE_INSTANCE }}
-  GCE_INSTANCE_ZONE: ${{ secrets.GCE_INSTANCE_ZONE }}
+  PROJECT_ID: ${{ secrets.PISO_WIFI_PROJECT_ID }}
 
 jobs:
   deploy:
@@ -20,23 +18,23 @@ jobs:
       - name: Install the gcloud CLI
         uses: google-github-actions/setup-gcloud@v0
         with:
-          service_account_key: ${{ secrets.GOOGLE_APPLICATION_CREDENTIALS }}
+          service_account_key: ${{ secrets.PISO_WIFI_SERVICE_ACCOUNT_KEY }}
           export_default_credentials: true
 
       - name: Build and push the Docker image to Artifact Registry
         run: |
           gcloud auth configure-docker asia-southeast1-docker.pkg.dev
-          docker build -t asia-southeast1-docker.pkg.dev/docker-390508/demo/python:3.9-alpine .
-          docker push asia-southeast1-docker.pkg.dev/docker-390508/demo/python:3.9-alpine
+          docker build -t asia-southeast1-docker.pkg.dev/rpi-hub-438905/piso-wifi-repository .
+          docker push asia-southeast1-docker.pkg.dev/rpi-hub-438905/piso-wifi-repository
 
-      - name: Deploy
+      # - name: Deploy
 
-        run: |
-          gcloud config set project "$PROJECT_ID"
-          gcloud compute instances update-container "$GCE_INSTANCE" \
-            --zone "$GCE_INSTANCE_ZONE" \
-           --container-image asia-southeast1-docker.pkg.dev/docker-390508/demo/python \
-            --container-restart-policy on-failure
+      #   run: |
+      #     gcloud config set project "$PROJECT_ID"
+      #     gcloud compute instances update-container "$GCE_INSTANCE" \
+      #       --zone "$GCE_INSTANCE_ZONE" \
+      #      --container-image asia-southeast1-docker.pkg.dev/docker-390508/demo/python \
+      #       --container-restart-policy on-failure
 
       # - name: Deploy
       #   run: |-
